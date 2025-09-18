@@ -1,5 +1,5 @@
 import express from "express";
-import puppeteer from "puppeteer-core";
+import puppeteer from "puppeteer"; // use puppeteer, not puppeteer-core
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -13,15 +13,13 @@ app.get("/scrape", async (req, res) => {
 
   try {
     const browser = await puppeteer.launch({
-      headless: "new",          // use Puppeteer's new headless mode
+      headless: "new",
       args: ["--no-sandbox", "--disable-setuid-sandbox"]
-      // REMOVE executablePath line
     });
 
     const page = await browser.newPage();
     await page.goto(url, { waitUntil: "networkidle0" });
 
-    // Scrape data
     const title = await page.$eval("section.image-view h1", el => el.textContent.trim());
     const artist = await page.$eval("section.image-view h2 a", el => el.textContent.trim());
     const image_url = await page.$eval("img#img-current-img", el => el.src);
@@ -31,7 +29,6 @@ app.get("/scrape", async (req, res) => {
     );
 
     await browser.close();
-
     res.json({ title, artist, image_url, description, categories });
   } catch (error) {
     console.error(error);
