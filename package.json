@@ -1,7 +1,7 @@
 {
   "name": "dz-gallery-scraper",
   "version": "1.0.0",
-  "description": "Puppeteer scraper for DAZ 3D galleries",
+  "description": "Remote Puppeteer scraper for DAZ 3D galleries",
   "main": "index.js",
   "type": "module",
   "scripts": {
