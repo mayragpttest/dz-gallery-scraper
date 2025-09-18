@@ -4,21 +4,31 @@ import puppeteer from "puppeteer";
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Use your Browserless token from environment variable
-const BROWSERLESS_ENDPOINT = process.env.BROWSERLESS_ENDPOINT;
-
 app.get("/scrape", async (req, res) => {
   const { url } = req.query;
-  if (!url) return res.status(400).json({ error: "Please provide a gallery URL as ?url=" });
+
+  if (!url) {
+    return res.status(400).json({ error: "Please provide a gallery URL as ?url=" });
+  }
 
   try {
-    // Connect to Browserless remote Chrome
-    const browser = await puppeteer.connect({
-      browserWSEndpoint: BROWSERLESS_ENDPOINT,
+    // Launch Puppeteer
+    const browser = await puppeteer.launch({
+      headless: true, // Set false if testing locally
+      args: ["--no-sandbox", "--disable-setuid-sandbox"]
     });
 
     const page = await browser.newPage();
-    await page.goto(url, { waitUntil: "networkidle0" });
+
+    // Set headers & viewport to mimic real browser
+    await page.setUserAgent(
+      "Mozilla/5.0 (Macintosh; Intel Mac OS X 13_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    );
+    await page.setViewport({ width: 1280, height: 800 });
+    await page.setExtraHTTPHeaders({ "Accept-Language": "en-US,en;q=0.9" });
+
+    // Navigate
+    await page.goto(url, { waitUntil: "networkidle2" });
 
     // Scrape data
     const title = await page.$eval("section.image-view h1", el => el.textContent.trim());
@@ -29,7 +39,7 @@ app.get("/scrape", async (req, res) => {
       els.map(el => el.textContent.trim())
     );
 
-    await browser.disconnect();
+    await browser.close();
 
     res.json({ title, artist, image_url, description, categories });
   } catch (error) {
@@ -38,4 +48,6 @@ app.get("/scrape", async (req, res) => {
   }
 });
 
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
