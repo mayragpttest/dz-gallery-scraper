@@ -13,9 +13,11 @@ app.get("/scrape", async (req, res) => {
 
   try {
     const browser = await puppeteer.launch({
-      executablePath: "/usr/bin/google-chrome", // system Chrome
+      headless: "new",          // use Puppeteer's new headless mode
       args: ["--no-sandbox", "--disable-setuid-sandbox"]
+      // REMOVE executablePath line
     });
+
     const page = await browser.newPage();
     await page.goto(url, { waitUntil: "networkidle0" });
 
@@ -24,7 +26,9 @@ app.get("/scrape", async (req, res) => {
     const artist = await page.$eval("section.image-view h2 a", el => el.textContent.trim());
     const image_url = await page.$eval("img#img-current-img", el => el.src);
     const description = await page.$eval("section.image-information pre", el => el.textContent.trim());
-    const categories = await page.$$eval("section.image-information p a.tag-link", els => els.map(el => el.textContent.trim()));
+    const categories = await page.$$eval("section.image-information p a.tag-link", els =>
+      els.map(el => el.textContent.trim())
+    );
 
     await browser.close();
 
