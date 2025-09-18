@@ -1,12 +1,17 @@
 {
-  "name": "dz-gallery-scrapper",
+  "name": "dz-gallery-scraper",
   "version": "1.0.0",
-  "type": "module",
+  "description": "Puppeteer scraper for DAZ 3D galleries",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "start": "node index.js"
   },
   "dependencies": {
+    "express": "^4.18.2",
     "puppeteer": "^24.10.2"
-  }
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
 }
