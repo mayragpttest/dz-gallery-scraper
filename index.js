@@ -1,6 +1,5 @@
 import express from "express";
-import puppeteer from "puppeteer-core";
-import chromium from "@sparticuz/chrome-linux";
+import puppeteer from "puppeteer";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -14,7 +13,6 @@ app.get("/scrape", async (req, res) => {
 
   try {
     const browser = await puppeteer.launch({
-      executablePath: chromium.path, // prebuilt Chromium binary
       args: ["--no-sandbox", "--disable-setuid-sandbox"]
     });
 
